@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trino-tester
+  namespace: testing-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: trino-tester
+  template:
+    metadata:
+      labels:
+        app: trino-tester
+    spec:
+      containers:
+      - name: trino-tester
+        image: frenoid/trino-load-tester:v1
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: TRINO_HOST
+            value: "trino.trino-namespace.svc.cluster.local" # Host of Trino cluster
+          - name: TRINO_USER
+            value: "trino-tester" # Trino connection user
+          - name: TRINO_CATALOG
+            value: "hive" # Trino catalog 
+          - name: SCHEMA_NAME
+            value: "test_trino" # Schema to write test tables
+          - name: SCHEMA_BUCKET
+            value: "datalake-bucket" # S3 bucket where test schema is located
+          - name: TABLE_PREFIX
+            value: "test" # test table names take this format: <table_prefix>_<uuid>
+          - name: TABLE_COUNT
+            value: "5" # How many tables to write in each interations
+          - name: SLEEP_INTERVAL
+            value: "2" # Seconds to wait between interations
+          
+
