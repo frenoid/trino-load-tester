@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: trino-tester
+  name: ctas-trino-tester
   namespace: testing-namespace
 spec:
   replicas: 3
@@ -34,5 +34,7 @@ spec:
             value: "5" # How many tables to write in each interations
           - name: SLEEP_INTERVAL
             value: "2" # Seconds to wait between interations
+          - name: MODE
+            value: "ctas" # Creates tables using Trino
           
 

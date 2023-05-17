@@ -6,6 +6,12 @@ Intention is to create entries in the Hive metastore
 ## Source
 It uses the [tpch.tiny.customer](https://www.tpc.org/tpch/) table as the source
 
+## Getting started
+Available modes are
+1. ctas
+2. select
+3. tpcds
+
 ## Structure
 [k8s](./k8s/) container Kubernetes manifests
 [app.py](./app.py) is the code entrypoint
