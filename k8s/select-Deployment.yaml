@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctas-trino-tester
+  namespace: testing-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: trino-tester
+  template:
+    metadata:
+      labels:
+        app: trino-tester
+    spec:
+      containers:
+      - name: trino-tester
+        image: frenoid/trino-load-tester:latest
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: TRINO_HOST
+            value: "trino.trino-namespace.svc.cluster.local" # Host of Trino cluster
+          - name: TRINO_PORT
+            value: 8080
+          - name: TRINO_USER
+            value: "trino-tester" # Trino connection user
+          - name: SLEEP_INTERVAL
+            value: "2" # Seconds to wait between interations
+          - name: MODE
+            value: "ctas" # Creates tables using Trino
+          
+
