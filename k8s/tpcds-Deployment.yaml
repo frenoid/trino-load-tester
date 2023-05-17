@@ -4,7 +4,7 @@ metadata:
   name: ctas-trino-tester
   namespace: testing-namespace
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: trino-tester
@@ -18,15 +18,22 @@ spec:
         image: frenoid/trino-load-tester:latest
         imagePullPolicy: IfNotPresent
         env:
+          - name: MODE
+            value: "tpcds" # Creates tables using Trino
           - name: TRINO_HOST
-            value: "trino.trino-namespace.svc.cluster.local" # Host of Trino cluster
+            value: "trino.trino.svc.cluster.local" # Host of Trino cluster
           - name: TRINO_PORT
             value: 8080
           - name: TRINO_USER
             value: "trino-tester" # Trino connection user
+          - name: TRINO_CATALOG
+            value: "tpcds" # tpcds catalog
+          - name: TPCDS_SCHEMA
+            value: "sf100" # Size of tpcds data
           - name: SLEEP_INTERVAL
             value: "2" # Seconds to wait between interations
-          - name: MODE
-            value: "ctas" # Creates tables using Trino
+          - name: MAX_RETRY
+            value: "3" # Maximum no of retries before giving up
+          
           
 
