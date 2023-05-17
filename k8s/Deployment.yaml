@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: trino-tester
-        image: frenoid/trino-load-tester:v1
+        image: frenoid/trino-load-tester:latest
         imagePullPolicy: IfNotPresent
         env:
           - name: TRINO_HOST
