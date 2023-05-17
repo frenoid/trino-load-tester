@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ctas-trino-tester
+  name: tpcds-trino-tester
   namespace: testing-namespace
 spec:
   replicas: 1
@@ -23,7 +23,7 @@ spec:
           - name: TRINO_HOST
             value: "trino.trino.svc.cluster.local" # Host of Trino cluster
           - name: TRINO_PORT
-            value: 8080
+            value: "8080"
           - name: TRINO_USER
             value: "trino-tester" # Trino connection user
           - name: TRINO_CATALOG
@@ -34,6 +34,8 @@ spec:
             value: "2" # Seconds to wait between interations
           - name: MAX_RETRY
             value: "3" # Maximum no of retries before giving up
+          - name: TPCDS_QUERY_NUMBER
+            value: "0"
           
           
 

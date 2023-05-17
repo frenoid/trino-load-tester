@@ -21,6 +21,7 @@ TABLE_PREFIX = getenv("TABLE_PREFIX", "test")
 TABLE_COUNT = int(getenv("TABLE_COUNT", 5))
 
 TPCDS_SCHEMA = getenv("TPCDS_SCHEMA", "sf100")
+TPCDS_QUERY_NUMBER = int(getenv("TPCDS_QUERY_NUMBER", 0)) # Lets you pick a tpcds query to repeat
 SLEEP_INTERVAL = int(getenv("SLEEP_INTERVAL", 3))
 MAX_RETRY = int(getenv("MAX_RETRY", 3)) # 0 means no limit to retries
 
@@ -78,8 +79,16 @@ def query_and_fetchall_with_retry(cursor, query: str, backoff_seconds: int, max_
     sleep(backoff_seconds)
 
   return results
-  
 
+def tpcds_query(cursor, query_number: int, backoff_seconds: int, max_retry: int) -> None:  
+  logging.info(f"*** Preparing query #{query_number}")
+  logging.info("Sending query")
+  query_and_fetchall_with_retry(cursor=cursor,
+                                query=get_tpcds_query(number=query_number),
+                                backoff_seconds=backoff_seconds,
+                                max_retry=max_retry)
+  logging.info(f"$$$ Completed query #{query_number}")
+  logging.info(f"Completed queries: {total_completed_queries}")
 
 
 if __name__ == "__main__":
@@ -153,14 +162,11 @@ if __name__ == "__main__":
 
     # Keep querying
     while True:
-      for query_number in range(1, MAX_TPCDS_QUERY_NUMBER + 1):
-        logging.info(f"*** Preparing query #{query_number}")
-        query = get_tpcds_query(number=query_number)
-        logging.info("Sending query")
-        query_and_fetchall_with_retry(cursor=cursor, query=query, backoff_seconds=SLEEP_INTERVAL, max_retry=MAX_RETRY)
-        logging.info(f"$$$ Completed query #{query_number}")
-        logging.info(f"Completed queries: {total_completed_queries}")
-
+      if TPCDS_QUERY_NUMBER == 0:
+        for query_number in range(1, MAX_TPCDS_QUERY_NUMBER + 1):
+          tpcds_query(cursor=cursor, query_number=query_number, backoff_seconds=SLEEP_INTERVAL, max_retry=MAX_RETRY)
+      else:
+          tpcds_query(cursor=cursor, query_number=TPCDS_QUERY_NUMBER, backoff_seconds=SLEEP_INTERVAL, max_retry=MAX_RETRY)
 
   else:
     logging.info("Unknown mode")
