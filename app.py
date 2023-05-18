@@ -83,13 +83,12 @@ def query_and_fetchall_with_retry(cursor, query: str, backoff_seconds: int, max_
 
 def tpcds_query(cursor, query_number: int, backoff_seconds: int, max_retry: int) -> None:  
   logging.info(f"*** Preparing query #{query_number}")
-  logging.info("Sending query")
+  logging.info(f"Sending query #{query_number}")
   query_and_fetchall_with_retry(cursor=cursor,
                                 query=get_tpcds_query(number=query_number),
                                 backoff_seconds=backoff_seconds,
                                 max_retry=max_retry)
   logging.info(f"$$$ Completed query #{query_number}")
-  logging.info(f"Completed queries: {total_completed_queries}")
 
 
 if __name__ == "__main__":
@@ -159,8 +158,7 @@ if __name__ == "__main__":
       schema=TPCDS_SCHEMA,
       catalog=TRINO_CATALOG).cursor()
     
-    total_completed_queries = 0
-
+  
     # cast TPCDS_SKIP_NUMBERS to int
     if TPCDS_SKIP_NUMBERS is None:
       TPCDS_SKIP_NUMBERS = []
@@ -169,6 +167,7 @@ if __name__ == "__main__":
     print(f"TPCDS_SKIP_NUMBERS: {TPCDS_SKIP_NUMBERS}")
 
     # Keep querying
+    total_completed_queries = 0
     while True:
       # If TPCDS_QUERY_NUMBER is unselected, iterate through all queries
       if TPCDS_QUERY_NUMBER == 0:
@@ -177,9 +176,13 @@ if __name__ == "__main__":
             print(f"query {query_number} in TPCDS_SKIP_NUMBERS")
             continue
           tpcds_query(cursor=cursor, query_number=query_number, backoff_seconds=SLEEP_INTERVAL, max_retry=MAX_RETRY)
+          total_completed_queries += 1
+          logging.info(f"Completed queries: {total_completed_queries}")
       # Otherwise repeat TPCDS_QUERY_NUMBER 
       else:
           tpcds_query(cursor=cursor, query_number=TPCDS_QUERY_NUMBER, backoff_seconds=SLEEP_INTERVAL, max_retry=MAX_RETRY)
+          total_completed_queries += 1
+          logging.info(f"Completed queries: {total_completed_queries}")
 
   else:
     logging.info("Unknown mode")
