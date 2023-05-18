@@ -22,6 +22,7 @@ TABLE_COUNT = int(getenv("TABLE_COUNT", 5))
 
 TPCDS_SCHEMA = getenv("TPCDS_SCHEMA", "sf100")
 TPCDS_QUERY_NUMBER = int(getenv("TPCDS_QUERY_NUMBER", 0)) # Lets you pick a tpcds query to repeat
+TPCDS_SKIP_NUMBERS = getenv("TPCDS_SKIP_NUMBERS", None) # Comma separated queries numbers to skip
 SLEEP_INTERVAL = int(getenv("SLEEP_INTERVAL", 3))
 MAX_RETRY = int(getenv("MAX_RETRY", 3)) # 0 means no limit to retries
 
@@ -160,11 +161,23 @@ if __name__ == "__main__":
     
     total_completed_queries = 0
 
+    # cast TPCDS_SKIP_NUMBERS to int
+    if TPCDS_SKIP_NUMBERS is None:
+      TPCDS_SKIP_NUMBERS = []
+    else:
+      TPCDS_SKIP_NUMBERS = [int(num) for num in TPCDS_SKIP_NUMBERS.split(",")]
+    print(f"TPCDS_SKIP_NUMBERS: {TPCDS_SKIP_NUMBERS}")
+
     # Keep querying
     while True:
+      # If TPCDS_QUERY_NUMBER is unselected, iterate through all queries
       if TPCDS_QUERY_NUMBER == 0:
         for query_number in range(1, MAX_TPCDS_QUERY_NUMBER + 1):
+          if query_number in TPCDS_SKIP_NUMBERS:
+            print(f"query {query_number} in TPCDS_SKIP_NUMBERS")
+            continue
           tpcds_query(cursor=cursor, query_number=query_number, backoff_seconds=SLEEP_INTERVAL, max_retry=MAX_RETRY)
+      # Otherwise repeat TPCDS_QUERY_NUMBER 
       else:
           tpcds_query(cursor=cursor, query_number=TPCDS_QUERY_NUMBER, backoff_seconds=SLEEP_INTERVAL, max_retry=MAX_RETRY)
 

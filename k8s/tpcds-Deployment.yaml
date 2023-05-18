@@ -35,7 +35,9 @@ spec:
           - name: MAX_RETRY
             value: "3" # Maximum no of retries before giving up
           - name: TPCDS_QUERY_NUMBER
-            value: "0"
+            value: "0" # Pick query to repeat, 0 means iterate through all
+          - name: TPCDS_SKIP_NUMBERS
+            value: "14" # comma separated list of numbers to skip e.g. 10,15,21
           
           
 

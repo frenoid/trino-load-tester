@@ -10,7 +10,7 @@ It uses the [tpch.tiny.customer](https://www.tpc.org/tpch/) table as the source
 Available modes are
 1. ctas
 2. select
-3. tpcdss
+3. tpcds
 
 ## Structure
 [k8s](./k8s/) container Kubernetes manifests
